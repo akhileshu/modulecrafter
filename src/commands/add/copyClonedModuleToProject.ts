@@ -6,6 +6,7 @@ import path from 'path';
 import { logMessages } from '../../core/common/message';
 import { configPaths } from '../../core/paths/paths';
 import { getLocalRepoPath } from '../../core/git/cloneRepo';
+import { parseGitHubUrl } from '../../core/git/parseGitHubUrl';
 
 function getAllRelativeFiles(dir: string, baseDir: string): string[] {
   let files: string[] = [];
@@ -57,16 +58,27 @@ interface CopyOptions {
   gitUrl: string;
 }
 
+/**
+ * 
+ * todo :
+ * 
+ * need to better handle dir , paths for copy in case of standalone / monorepo workspace / repo subfolder
+ */
 export async function copyClonedModuleToProject({
   sourceDir, //"/home/akhilesh/modulecrafter-cli/repos/akhileshu/akhilesh-portfolio/src/components/app"
   targetDir = path.join(process.cwd(), 'projects'),
   gitUrl,
 }: CopyOptions): Promise<boolean> {
+  const gitMeta = parseGitHubUrl(gitUrl);
+  if (!gitMeta) return false;
   if (!(await fs.pathExists(sourceDir))) {
     console.error(`Source directory does not exist: ${sourceDir}`);
     return false;
   }
-  const relativeFiles = getAllRelativeFiles(sourceDir, sourceDir);
+  const parentDir = path.dirname(sourceDir); // one level above sourceDir
+  const relativeFiles = getAllRelativeFiles(sourceDir, parentDir);
+
+  // const relativeFiles = getAllRelativeFiles(sourceDir, parentDir); // all paths relative to components dir
   if (relativeFiles.length === 0) {
     console.warn(`No files found in source directory: ${sourceDir}`);
     return false;
@@ -76,11 +88,18 @@ export async function copyClonedModuleToProject({
   if (!localRepoPath) return false;
 
   for (const relativeFile of relativeFiles) {
+    const sourceFilePath = path.join(parentDir, relativeFile); //(.../components , app/...)
+    /*
     const sourceFilePath = path.join(sourceDir, relativeFile); //"/home/akhilesh/modulecrafter-cli/repos/akhileshu/akhilesh-portfolio/src/components/app/ExpandableText.tsx"
-    // const targetBaseDir = sourceDir.replace(localRepoPath, ''); //"/src/components/app"
+    const targetBaseDir2 = sourceDir.replace(localRepoPath, ''); //"/src/components/app"
+    const targetBaseDir3 = path.relative(
+      path.join(localRepoPath, gitMeta.type === 'repoSubfolderUrl' ? gitMeta.folderPath : ''),
+      sourceDir,
+    ); //"/src/components/app"
     const targetBaseDir = path.relative(localRepoPath, sourceDir); //"/src/components/app"
     const targetFilePath = path.join(targetDir, targetBaseDir, relativeFile); //"/home/akhilesh/software-projects/feature-cli/src/components/app/ExpandableText.tsx"
-
+*/
+    const targetFilePath = path.join(targetDir, relativeFile);
     await fs.ensureDir(path.dirname(targetFilePath));
 
     if (await fs.pathExists(targetFilePath)) {

@@ -15,9 +15,9 @@ export function getLocalRepoPath(gitUrl: string) {
 }
 
 const config = ConfigManager.getInstance().getConfig();
-const commonOptions = ConfigManager.getInstance().getCommonOptions();
 
 export async function cloneRepo(gitUrl: string): Promise<boolean> {
+  const commonOptions = ConfigManager.getInstance().getCommonOptions();
   const localRepoPath = getLocalRepoPath(gitUrl);
   if (!localRepoPath) return false;
   const repoExists = fs.existsSync(localRepoPath);
@@ -39,6 +39,7 @@ export async function cloneRepo(gitUrl: string): Promise<boolean> {
 
     if (!parsed) return false;
     await git.clone(parsed.repoUrl, localRepoPath, ['--branch', parsed.branch]);
+    
     return true;
   } catch (err) {
     logMessages([

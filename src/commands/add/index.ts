@@ -73,6 +73,7 @@ async function handleMonorepo(
   const folderToCopy = await selectSubFolderIfMultiple(localModulePath);
   if (!folderToCopy) return;
 
+  //todo : using process.cwd() in deleted directory caused issues , need better error handling
   const isCopied = await copyClonedModuleToProject({ sourceDir: folderToCopy, targetDir: process.cwd(), gitUrl });
   if (!isCopied) return;
 
@@ -92,7 +93,9 @@ async function handleRepoSubFolder(
   });
   if (!shouldContinue) return;
 
-  const isCopied = await copyClonedModuleToProject({ sourceDir: localModulePath, targetDir: process.cwd(), gitUrl });
+  const targetDir =
+    gitMeta.type === 'repoSubfolderUrl' ? path.dirname(path.join(process.cwd(), gitMeta.folderPath)) : process.cwd();
+  const isCopied = await copyClonedModuleToProject({ sourceDir: localModulePath, targetDir: targetDir, gitUrl });
   if (!isCopied) return;
 
   const pkgJsonPath = await getClosestPackageJsonPath(localModulePath, configPaths.REPO_DIR);

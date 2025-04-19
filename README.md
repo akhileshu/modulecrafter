@@ -1,36 +1,101 @@
-Here’s your **comprehensive and updated README** for **ModuleCrafter CLI**, reflecting all features, structure, logging, verbose support, modular design, and usage.
-
----
 
 # 📦 ModuleCrafter CLI
+![modcraft banner](/public/stop-copy-pasting-modcraft.png)
 
-A powerful CLI to **import and sync reusable feature modules** from remote GitHub repositories into your local project.
-
-Built for modern teams using:
-
-- Monorepos
-- Standalone repos
-- Subfolder-based module storage
+A powerful CLI to **import and sync reusable feature modules** or **bootstrap full projects** from GitHub —  
+**no manual cloning, copying, or dependency headaches.**
 
 ---
 
-## ✅ Key Features
+## 🚫 Problem: Manual GitHub Module Reuse is Painful
 
-- 🧩 **Add modules** from any GitHub URL
-- 🔁 **Sync dependencies** with intelligent prompts
-- 📁 Auto-detects closest `package.json`
-- 💬 **Verbose logging** for debugging
-- 📂 Supports monorepos, workspaces & subfolders
-- 🧪 Modular architecture & tests
-- 📈 Analytics for command usage (optional)
+Want to reuse a subfolder/module from GitHub?
+
+You typically have to:
+
+- Clone the full repo
+- Locate and copy the needed folder
+- Rename it
+- Paste it into your project
+- Manually install dependencies
+- Delete extra files
+
+😩 Tedious. Time-consuming. Error-prone.
 
 ---
 
-Sure Akhilesh! Here's your improved **Installation section** highlighting it's a single-command setup and what it does:
+## ✅ Solution: ModuleCrafter Does It All for You
+
+Just run:
+
+```bash
+modcraft add <github-url>
+```
+
+or
+
+```bash
+modcraft create-from <github-url>
+```
+
+✅ Features:
+
+- Downloads **only** the subfolder you want  
+- Injects it into your project, with optional renaming  
+- Installs dependencies (or skips if you choose)  
+- Works with monorepos, standalone repos, or subfolders  
+- Interactive CLI with detailed logs
 
 ---
 
-## 📦 Installation
+## 💡 Real Example
+
+You want to start with this folder:  
+[helloworld-test-sample](https://github.com/microsoft/vscode-extension-samples/tree/main/helloworld-test-sample)
+
+### ❌ Without ModuleCrafter:
+
+```bash
+git clone https://github.com/microsoft/vscode-extension-samples
+cd vscode-extension-samples/helloworld-test-sample
+cp -r helloworld-test-sample ~/your-app/
+cd ~/your-app/helloworld-test-sample
+npm install
+code .
+```
+
+### ✅ With ModuleCrafter:
+
+```bash
+modcraft create-from https://github.com/microsoft/vscode-extension-samples/tree/main/helloworld-test-sample
+```
+
+🎉 Done! You’re ready to code.
+
+---
+
+## 🔧 Use Cases
+
+- Reuse modules from starter or mono repos  
+- Extract subfolders from large GitHub projects  
+- Bootstrap new projects using existing examples  
+- Auto-sync dependencies
+
+---
+
+## 🔑 Features
+
+- 🧩 Import modules directly from GitHub
+- 🔁 Sync or skip dependencies
+- 🧠 Smart detection (monorepo, subfolder, standalone)
+- ⚙️ Auto-detects `package.json` and target paths
+- 💬 Verbose logs, interactive CLI
+- 📈 Optional CLI analytics
+- 🧪 Modular & testable structure
+
+---
+
+## 🚀 Install
 
 ```bash
 git clone https://github.com/akhileshu/modulecrafter.git
@@ -38,52 +103,47 @@ cd modulecrafter
 npm run setup
 ```
 
-> ✅ **One-command CLI setup!**  
-> Just run `npm run setup` and you're ready to use `modcraft` globally.
+The setup script handles:
 
-### 🔧 What it does:
-- Installs all dependencies (`npm install`)
-- Prepares required folders (analytics, repos, config)
-- Builds the project (`tsc`)
-- Makes CLI executable (`chmod`)
-- Links CLI globally (`npm link`)
+- Installing dependencies
+- TypeScript build (`tsc`)
+- File permissions (`chmod`)
+- CLI linking (`npm link`)
 
-After this, you can use `modcraft` directly in any terminal.
+Use `modcraft` globally in any terminal.
 
 ---
 
-## 🚀 Usage
+## 🧪 Usage
 
-Run this anywhere in your project directory:
-
-### Add a Remote Module
+### 📥 Add a Remote Module
 
 ```bash
-modcraft add <git-url>
+modcraft add <github-url>
 ```
 
-✅ Supported `git-url` formats:
-
-- Full repo:  
-  `https://github.com/org/repo`
-- Subfolder in repo:  
-  `https://github.com/org/repo/tree/main/path/to/module`
-
-**Example:**
+### 🏗️ Create Project from a Subfolder
 
 ```bash
-modcraft add https://github.com/my-org/awesome/tree/main/modules/logger
+modcraft create-from <github-url> [optional-name]
 ```
 
-### CLI Overview
+#### ✅ Supported URL Formats
+
+```bash
+https://github.com/org/repo
+https://github.com/org/repo/tree/main/path/to/folder
+```
+
+---
+
+## 📖 CLI Commands
 
 ```bash
 modcraft --help
 ```
 
 ```txt
-CLI to inject feature modules into projects
-
 Usage: modcraft [options] [command]
 
 Options:
@@ -103,58 +163,62 @@ Commands:
 
 ## ⚙️ Configuration
 
-`modcraft init` creates a `config.mjs` with interactive prompts.
+Check compatibility:
 
-Paths used:
+```bash
+❯ node -v     → v22.14.0  
+❯ npm -v      → 10.9.2  
+❯ git -v      → git version 2.43.0
+```
 
-| Item            | Path                                                       |
-|-----------------|------------------------------------------------------------|
-| Analytics       | `~/.config/modulecrafter-cli/analytics.json`              |
-| Config File     | `~/.config/modulecrafter-cli/config.mjs`                  |
-| Cloned Repos    | `~/modulecrafter-cli/repos`                                |
+Create config:
 
-You can customize module destination paths, verbose mode, and more.
+```bash
+modcraft init
+```
+
+Generates:
+
+```
+~/.config/modulecrafter-cli/config.mjs
+```
+
+Coming soon:
+
+- Default paths  
+- Dependency sync options  
+- Local repo cache settings  
 
 ---
 
-## 🔧 Architecture
+## 🧱 Project Structure
 
 ```
 .
-├── commands/
-│   └── add/
+├── commands/               # CLI commands
 ├── core/
-│   ├── analytics/
-│   ├── config/
-│   ├── git/
-│   ├── paths/
-│   ├── user-input/
-│   ├── types/
-│   └── common/
+│   ├── analytics/          # CLI usage tracking
+│   ├── config/             # Config loader/writer
+│   ├── git/                # GitHub handling
+│   ├── paths/              # Path resolution
+│   ├── user-input/         # Prompts
+│   ├── common/             # Logging, utils
+│   └── types/              # TypeScript types
 ├── tests/
-├── cli.ts
-├── bin/modcraft
 ```
-
-### Key Modules
-
-- `core/config/`: Handles config load and caching with `ConfigManager`
-- `core/git/`: Parses GitHub URLs, clones repos
-- `core/paths/`: Detects `package.json`, manages paths
-- `core/common/log.ts`: Verbose logger with emoji, colors, and error support
-- `core/analytics/`: Stores and prints usage analytics
 
 ---
 
-## 📘 How It Works
+## 🧠 How It Works
 
-### 🔍 GitHub URL Parsing
+### GitHub URL Parsing
 
 ```ts
 parseGitHubUrl('https://github.com/user/repo/tree/main/path');
 ```
 
-Returns structured metadata:
+Returns:
+
 ```ts
 {
   owner: 'user',
@@ -164,93 +228,62 @@ Returns structured metadata:
 }
 ```
 
-### 🧠 Cloning Flow
+### Module Injection Flow
 
-1. Parse URL
-2. Clone repo into cache
-3. Detect type:
-   - `standaloneProject`
-   - `monorepoWorkspace`
-   - `repoSubfolder`
-
-### 📦 Module Injection
-
-- Locate source and destination
-- Copy files from repo to local project
-- Detect nearest `package.json`
-- Prompt to install and sync dependencies (can be skipped)
-- Logs with optional verbose output
+1. Parse GitHub URL  
+2. Clone to local cache  
+3. Determine type (monorepo, subfolder, etc.)  
+4. Copy to target  
+5. Prompt for dependency sync  
+6. Show logs & next steps  
 
 ---
 
-## 📜 Logging & Verbose Mode
-
-Uses a centralized `logMessages` utility:
-
-```ts
-logMessages([
-  { message: 'Module copied successfully', level: 'success' },
-  { message: 'Cloning failed', level: 'error', error: new Error('...') },
-]);
-```
-
-- `verbose` flag in config enables detailed error stack traces
-- Levels: `info`, `success`, `warn`, `error`, `custom`
-
----
-
-## 🧪 Testing
-
-Test structure follows the command and core layout.
+## ✅ Testing
 
 ```bash
 npm run test
 ```
 
-Work in progress:
-- Unit tests for core modules
-- CLI command integration tests
+Test structure mirrors the CLI:
 
----
-
-## 📈 Analytics
-
-- Tracks usage per command and timestamp
-- Can be disabled in `config.mjs`
-- Stored locally at:  
-  `~/.config/modulecrafter-cli/analytics.json`
-
----
-
-## 🔧 Utilities
-
-### `loadAndSetConfig`
-
-Central utility to load config and apply CLI options:
-
-```ts
-await loadAndSetConfig(options);
+```
+tests/
+├── commands/
+└── core/
 ```
 
-Sets `verbose` and `manual` flags dynamically.
+Unit + integration coverage expanding steadily.
 
 ---
 
-## 🛠️ Helper Functions
+## 📊 Analytics
 
-- `parseGitHubUrl(url)`
-- `logMessages(logs[])`
-- `copyModule()`
-- `findClosestPackageJson()`
-- `promptDependencyInstall()`
+Tracks CLI usage (local only):
+
+- Command frequency  
+- Timestamp logs  
+
+Stored at:
+
+```
+~/.config/modulecrafter-cli/analytics.json
+```
+
+Disable it via `config.mjs`.
 
 ---
 
 ## 🤝 Contributing
 
-1. Fork the repo
-2. Create a branch: `git checkout -b feat/my-feature`
-3. Push and open a PR
+```bash
+git checkout -b feat/your-feature
+```
+
+Then open a PR with:
+
+- Clear description  
+- Proper formatting  
 
 ---
 

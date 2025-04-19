@@ -6,18 +6,17 @@ export interface ListModulesParams {
   options: ListCommandOptions;
 }
 /**
- * 
- * this function or cmd needs improvements and not currently functional 
+ *
+ * this function or cmd needs improvements and not currently functional
  */
 export async function listModules({ options }: ListModulesParams) {
-
   /*
   const { dryRun = false, useCachedRepo = false } = options;
   const cloned = await cloneRepo(useCachedRepo);
   if (!cloned) return;
 
   try {
-    const BASE_DIR_PATH = path.join(TEMP_DIR_PATH, 'modules'); // .tmp-feature-modules/modules
+    const BASE_DIR_PATH = path.join(configPaths.REPO_DIR, 'modules'); // .tmp-feature-modules/modules
     const categories = await fs.readdir(BASE_DIR_PATH);
 
     for (const cat of categories) {

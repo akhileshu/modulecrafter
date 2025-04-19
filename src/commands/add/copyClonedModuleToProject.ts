@@ -4,7 +4,8 @@ import crypto from 'crypto';
 import fs from 'fs-extra';
 import path from 'path';
 import { logMessages } from '../../core/common/message';
-import { TEMP_DIR_PATH } from '../../core/common/paths';
+import { configPaths } from '../../core/paths/paths';
+import { getLocalRepoPath } from '../../core/git/cloneRepo';
 
 function getAllRelativeFiles(dir: string, baseDir: string): string[] {
   let files: string[] = [];
@@ -39,6 +40,9 @@ function generateUniqueHash(str: string): string {
     .slice(0, 6);
 }
 
+/**
+ *  we sometimes left we empty folders after reverting , but thats ok for now
+ */
 async function revertCopiedFiles(paths: string[]) {
   for (const filePath of paths) {
     await fs.remove(filePath);
@@ -48,21 +52,34 @@ async function revertCopiedFiles(paths: string[]) {
 }
 
 interface CopyOptions {
-  sourcePath: string;
-  targetPath?: string;
+  sourceDir: string;
+  targetDir?: string;
+  gitUrl: string;
 }
 
 export async function copyClonedModuleToProject({
-  sourcePath,
-  targetPath = path.join(process.cwd(), 'project'),
+  sourceDir, //"/home/akhilesh/modulecrafter-cli/repos/akhileshu/akhilesh-portfolio/src/components/app"
+  targetDir = path.join(process.cwd(), 'projects'),
+  gitUrl,
 }: CopyOptions): Promise<boolean> {
-  const relativeFiles = getAllRelativeFiles(sourcePath, sourcePath);
+  if (!(await fs.pathExists(sourceDir))) {
+    console.error(`Source directory does not exist: ${sourceDir}`);
+    return false;
+  }
+  const relativeFiles = getAllRelativeFiles(sourceDir, sourceDir);
+  if (relativeFiles.length === 0) {
+    console.warn(`No files found in source directory: ${sourceDir}`);
+    return false;
+  }
   const copiedFilePaths: string[] = [];
+  const localRepoPath = getLocalRepoPath(gitUrl);
+  if (!localRepoPath) return false;
 
   for (const relativeFile of relativeFiles) {
-    const sourceFilePath = path.join(sourcePath, relativeFile);
-    const targetBase = sourcePath.replace(TEMP_DIR_PATH, '');
-    const targetFilePath = path.join(targetPath, targetBase, relativeFile);
+    const sourceFilePath = path.join(sourceDir, relativeFile); //"/home/akhilesh/modulecrafter-cli/repos/akhileshu/akhilesh-portfolio/src/components/app/ExpandableText.tsx"
+    // const targetBaseDir = sourceDir.replace(localRepoPath, ''); //"/src/components/app"
+    const targetBaseDir = path.relative(localRepoPath, sourceDir); //"/src/components/app"
+    const targetFilePath = path.join(targetDir, targetBaseDir, relativeFile); //"/home/akhilesh/software-projects/feature-cli/src/components/app/ExpandableText.tsx"
 
     await fs.ensureDir(path.dirname(targetFilePath));
 

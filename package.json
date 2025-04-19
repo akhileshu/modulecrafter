@@ -1,14 +1,19 @@
 {
-  "name": "feature-cli",
+  "name": "modulecrafter",
   "version": "1.0.0",
   "main": "index.ts",
   "type": "commonjs",
   "bin": {
-    "feature-cli": "dist/index.js"
+    "modcraft": "dist/index.js"
   },
   "scripts": {
+    "prebuild": "ts-node scripts/prebuild.ts",
+    "build": "npm run prebuild &&  tsc",
+    "link-cli": "npm run build && npm link",
+    "unlink-cli": "npm unlink -g",
+    "setup": "chmod +x scripts/setup.sh && scripts/setup.sh",
+    "debug": "node --inspect-brk dist/index.js",
     "test": "vitest run",
-    "build": "tsc",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "start": "ts-node src/index.ts",
@@ -21,24 +26,19 @@
   "dependencies": {
     "@inquirer/number": "^3.0.12",
     "@inquirer/prompts": "^7.4.1",
-    "@radix-ui/react-dialog": "^1.1.7",
-    "axios": "^1.8.4",
     "chalk": "^5.4.1",
-    "clsx": "^2.1.1",
     "commander": "^13.1.0",
     "fs-extra": "^11.3.0",
     "inquirer": "^12.5.2",
-    "next-auth": "^4.24.11",
     "ora": "^8.2.0",
     "prettier": "^3.5.3",
     "semver": "^7.7.1",
     "simple-git": "^3.27.0",
-    "tw-animate-css": "^1.2.5",
+    "table": "^6.9.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
-    "@tailwindcss/postcss": "^4.1.3",
     "@types/chalk": "^0.4.31",
     "@types/commander": "^2.12.0",
     "@types/fs-extra": "^11.0.4",

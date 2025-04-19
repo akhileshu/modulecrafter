@@ -1,5 +1,5 @@
 import path from 'path';
-import { TEMP_DIR_PATH } from '..';
+import { configPaths } from '../paths/paths';
 
 /**
  *
@@ -16,7 +16,7 @@ export function getGitHubBlobUrl(
   },
 ): string {
   const gitHubBlobUrl = localPath.replace(
-    TEMP_DIR_PATH,
+    configPaths.REPO_DIR,
     `https://github.com/${parsedGitInfo.user}/${parsedGitInfo.repo}/blob/${parsedGitInfo.branch}`,
   );
   return gitHubBlobUrl;

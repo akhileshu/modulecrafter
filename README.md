@@ -1,189 +1,260 @@
-Here's a **production-grade `README.md`** for your CLI tool based on your structure, naming, and logic:
+Here’s your **comprehensive and updated README** for **ModuleCrafter CLI**, reflecting all features, structure, logging, verbose support, modular design, and usage.
 
 ---
 
-
 # 📦 ModuleCrafter CLI
 
-A CLI tool to **import and sync reusable feature modules** from remote GitHub repositories into your local project.
+A powerful CLI to **import and sync reusable feature modules** from remote GitHub repositories into your local project.
 
-Supports:
+Built for modern teams using:
+
 - Monorepos
-- Standalone repositories
-- Subfolder-based module repositories
+- Standalone repos
+- Subfolder-based module storage
+
+---
+
+## ✅ Key Features
+
+- 🧩 **Add modules** from any GitHub URL
+- 🔁 **Sync dependencies** with intelligent prompts
+- 📁 Auto-detects closest `package.json`
+- 💬 **Verbose logging** for debugging
+- 📂 Supports monorepos, workspaces & subfolders
+- 🧪 Modular architecture & tests
+- 📈 Analytics for command usage (optional)
+
+---
+
+Sure Akhilesh! Here's your improved **Installation section** highlighting it's a single-command setup and what it does:
 
 ---
 
 ## 📦 Installation
 
 ```bash
-npm install -g feature-module-cli
-# or locally
-npm install feature-module-cli --save-dev
+git clone https://github.com/akhileshu/modulecrafter.git
+cd modulecrafter
+npm run setup
 ```
+
+> ✅ **One-command CLI setup!**  
+> Just run `npm run setup` and you're ready to use `modcraft` globally.
+
+### 🔧 What it does:
+- Installs all dependencies (`npm install`)
+- Prepares required folders (analytics, repos, config)
+- Builds the project (`tsc`)
+- Makes CLI executable (`chmod`)
+- Links CLI globally (`npm link`)
+
+After this, you can use `modcraft` directly in any terminal.
 
 ---
 
 ## 🚀 Usage
 
-### `add` - Add a remote feature module
+Run this anywhere in your project directory:
+
+### Add a Remote Module
 
 ```bash
-feature-cli add <git-url>
+modcraft add <git-url>
 ```
 
-- `git-url` can be:
-  - A full GitHub repo URL (e.g., `https://github.com/org/repo`)
-  - A URL pointing to a subfolder in a repo (e.g., `https://github.com/org/repo/tree/main/packages/module-a`)
+✅ Supported `git-url` formats:
 
-Example:
+- Full repo:  
+  `https://github.com/org/repo`
+- Subfolder in repo:  
+  `https://github.com/org/repo/tree/main/path/to/module`
+
+**Example:**
 
 ```bash
-feature-cli add https://github.com/my-org/awesome-modules/tree/main/modules/logger
+modcraft add https://github.com/my-org/awesome/tree/main/modules/logger
 ```
 
----
-
-## 🔧 Commands
-
-### `init` - Initialize CLI config
+### CLI Overview
 
 ```bash
-feature-cli init
+modcraft --help
 ```
 
-Creates a `config.mjs` file in your project root.
+```txt
+CLI to inject feature modules into projects
 
----
+Usage: modcraft [options] [command]
 
-### `list-modules`
+Options:
+  -V, --version            Show version
+  -h, --help               Show help
 
-```bash
-feature-cli list
+Commands:
+  analytics                Show CLI usage analytics
+  show-repos               List all cloned GitHub repos
+  show-paths               Show current paths and config info
+  init                     Create a config.mjs file if missing
+  add <git-url>            Add a module from a GitHub URL
+  create-from <url> [name] Extract project from a monorepo subfolder
 ```
-
-Lists previously imported modules (if tracking is enabled).
-
----
-
-## 🧠 How It Works
-
-### Clone Flow
-
-1. Parses GitHub URL using `parseGitHubUrl`.
-2. Clones the repo into `.tmp-feature-modules/`.
-3. Detects repo type:
-   - `standaloneProject`: has `package.json` at root
-   - `repoSubfolder`: no `package.json` at root
-   - `monorepoWorkspace`: root has `package.json`, but URL points to subfolder
-
-### Copy & Sync Flow
-
-- Copies folder into project
-- Prompts to install and sync dependencies (with confirmation)
-- Supports detecting closest `package.json` to sync from
-
----
-
-## 🛠️ Project Structure
-
-```
-.
-├── commands
-│   ├── add/
-│   │   └── index.ts
-│   └── initCommand.ts
-│   └── listModules.ts
-├── core
-│   ├── git/
-│   ├── config/
-│   ├── common/
-│   ├── user-input/
-│   └── types/
-├── tests/
-├── index.ts
-```
-
-- `core/`: All core logic (e.g., Git ops, config, utils)
-- `commands/`: CLI command entry points
-- `tests/`: Unit tests for each command
-
----
-
-## 🧪 Running Tests
-
-```bash
-npm test
-```
-
----
-
-## 🧹 Cleaning Up
-
-Temporary files are stored in:
-
-```
-.tmp-feature-modules/
-```
-
-They are automatically removed unless `useCachedRepo` is set to true.
 
 ---
 
 ## ⚙️ Configuration
 
-A `config.mjs` file is generated in your project root after running:
+`modcraft init` creates a `config.mjs` with interactive prompts.
+
+Paths used:
+
+| Item            | Path                                                       |
+|-----------------|------------------------------------------------------------|
+| Analytics       | `~/.config/modulecrafter-cli/analytics.json`              |
+| Config File     | `~/.config/modulecrafter-cli/config.mjs`                  |
+| Cloned Repos    | `~/modulecrafter-cli/repos`                                |
+
+You can customize module destination paths, verbose mode, and more.
+
+---
+
+## 🔧 Architecture
+
+```
+.
+├── commands/
+│   └── add/
+├── core/
+│   ├── analytics/
+│   ├── config/
+│   ├── git/
+│   ├── paths/
+│   ├── user-input/
+│   ├── types/
+│   └── common/
+├── tests/
+├── cli.ts
+├── bin/modcraft
+```
+
+### Key Modules
+
+- `core/config/`: Handles config load and caching with `ConfigManager`
+- `core/git/`: Parses GitHub URLs, clones repos
+- `core/paths/`: Detects `package.json`, manages paths
+- `core/common/log.ts`: Verbose logger with emoji, colors, and error support
+- `core/analytics/`: Stores and prints usage analytics
+
+---
+
+## 📘 How It Works
+
+### 🔍 GitHub URL Parsing
+
+```ts
+parseGitHubUrl('https://github.com/user/repo/tree/main/path');
+```
+
+Returns structured metadata:
+```ts
+{
+  owner: 'user',
+  repo: 'repo',
+  branch: 'main',
+  subfolder: 'path'
+}
+```
+
+### 🧠 Cloning Flow
+
+1. Parse URL
+2. Clone repo into cache
+3. Detect type:
+   - `standaloneProject`
+   - `monorepoWorkspace`
+   - `repoSubfolder`
+
+### 📦 Module Injection
+
+- Locate source and destination
+- Copy files from repo to local project
+- Detect nearest `package.json`
+- Prompt to install and sync dependencies (can be skipped)
+- Logs with optional verbose output
+
+---
+
+## 📜 Logging & Verbose Mode
+
+Uses a centralized `logMessages` utility:
+
+```ts
+logMessages([
+  { message: 'Module copied successfully', level: 'success' },
+  { message: 'Cloning failed', level: 'error', error: new Error('...') },
+]);
+```
+
+- `verbose` flag in config enables detailed error stack traces
+- Levels: `info`, `success`, `warn`, `error`, `custom`
+
+---
+
+## 🧪 Testing
+
+Test structure follows the command and core layout.
 
 ```bash
-feature-cli init
+npm run test
 ```
 
-> ❗ This file is **project-specific** and should be **ignored in `.gitignore`**.
+Work in progress:
+- Unit tests for core modules
+- CLI command integration tests
 
 ---
 
-## 📁 .gitignore Suggestion
+## 📈 Analytics
 
-```gitignore
-# CLI-generated config
-config.mjs
+- Tracks usage per command and timestamp
+- Can be disabled in `config.mjs`
+- Stored locally at:  
+  `~/.config/modulecrafter-cli/analytics.json`
 
-# Temp cloned modules
-.tmp-feature-modules/
+---
 
-# Build output
-dist/
+## 🔧 Utilities
+
+### `loadAndSetConfig`
+
+Central utility to load config and apply CLI options:
+
+```ts
+await loadAndSetConfig(options);
 ```
 
----
-
-## 📌 Naming Conventions
-
-- `TEMP_DIR_PATH`: Always absolute path
-- `cmdWithCommonOptions.ts`: Merges global CLI options
-- `safe-read-json.ts`: JSON reader with error handling
-- `mergeOptions.ts`: Merges CLI and config values
+Sets `verbose` and `manual` flags dynamically.
 
 ---
 
-## 🧩 Future Plans
+## 🛠️ Helper Functions
 
-- Automatic version conflict resolution
-- Template-based module generation
-- Support for non-GitHub sources (Bitbucket, GitLab)
+- `parseGitHubUrl(url)`
+- `logMessages(logs[])`
+- `copyModule()`
+- `findClosestPackageJson()`
+- `promptDependencyInstall()`
 
 ---
 
 ## 🤝 Contributing
 
 1. Fork the repo
-2. Create your feature branch: `git checkout -b feat/my-feature`
-3. Commit changes
-4. Push and open PR
+2. Create a branch: `git checkout -b feat/my-feature`
+3. Push and open a PR
 
 ---
 
 ## 📜 License
 
-MIT © Akhilesh
-# modulecrafter
+MIT © [Akhilesh](https://github.com/akhileshu)
+

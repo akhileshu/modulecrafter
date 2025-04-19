@@ -1,4 +1,4 @@
-export const configTemplate = `
+export const defaultConfig = `
 // config.mjs
 
 /**
@@ -10,10 +10,11 @@ export const configTemplate = `
 
 /** @type {Config} */
 const config = {
-  verbose: {{verbose}},
-  useCache: {{useCache}},
-  overwrite: {{overwrite}},
+  verbose: false,
+  useCache: true,
+  overwrite: false,
 };
 
 export default config;
+
 `;

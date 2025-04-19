@@ -1,7 +1,7 @@
 import { select } from '@inquirer/prompts';
 import fs from 'fs-extra';
 import path from 'path';
-import { TEMP_DIR_PATH } from '../common/paths';
+import { configPaths } from '../paths/paths';
 
 const REPO_URL = 'https://github.com/akhileshu/feature-modules.git';
 
@@ -12,7 +12,7 @@ const REPO_URL = 'https://github.com/akhileshu/feature-modules.git';
  * "modules/nextjs/auth/nextauth"
  */
 export async function getModulePath() {
-  const BASE_DIR_PATH = path.join(TEMP_DIR_PATH, 'modules');
+  const BASE_DIR_PATH = path.join(configPaths.REPO_DIR, 'modules');
 
   // 1. Ask for framework
   const framework = await select({
@@ -38,6 +38,6 @@ export async function getModulePath() {
     choices: modules.map((mod) => ({ name: mod, value: mod })),
   });
 
-  const modulePath = path.join(TEMP_DIR_PATH, `modules/${framework}/${category}/${module}`); // .tmp-feature-modules/modules
+  const modulePath = path.join(configPaths.REPO_DIR, `modules/${framework}/${category}/${module}`); // .tmp-feature-modules/modules
   return modulePath;
 }

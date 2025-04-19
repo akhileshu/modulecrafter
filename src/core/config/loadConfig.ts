@@ -1,14 +1,13 @@
 import { z, ZodError } from 'zod';
-// @ts-ignore
-import rawConfig from '../../../config.mjs'; // relative to src
+
 import { logMessages } from '../common/message';
+import { configPaths } from '../paths/paths';
+
 
 const configSchema = z.object({
-  dryRun: z.boolean(),
   verbose: z.boolean(),
   useCache: z.boolean(),
   overwrite: z.boolean(),
-  custom: z.string(),
 });
 
 function formatZodErrors(error: ZodError): string {
@@ -20,8 +19,10 @@ function formatZodErrors(error: ZodError): string {
 
 export type UserConfig = z.infer<typeof configSchema>;
 
-export const loadConfig = () => {
-  const parsed = configSchema.safeParse(rawConfig);
+export const loadConfig = async () => {
+  const rawConfig = await import(configPaths.CONFIG_FILE_PATH);
+  // const parsed = configSchema.safeParse(rawConfig.default.config); // for named export
+  const parsed = configSchema.safeParse(rawConfig.default); // for default export
 
   if (!parsed.success) {
     const formatted = formatZodErrors(parsed.error);
@@ -31,3 +32,4 @@ export const loadConfig = () => {
 
   return parsed.data;
 };
+

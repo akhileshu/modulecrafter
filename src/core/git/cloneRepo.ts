@@ -3,34 +3,49 @@ import path from 'path';
 import simpleGit from 'simple-git';
 import { logMessages } from '../common/message';
 import { parseGitHubUrl } from './parseGitHubUrl';
-import { TEMP_DIR_PATH } from '../common/paths';
+import { configPaths } from '../paths/paths';
+import { confirm } from '@inquirer/prompts';
+import { ConfigManager } from '../config/configManager';
 
-export async function removeTempDir() {
-  await fs.remove(TEMP_DIR_PATH);
+export function getLocalRepoPath(gitUrl: string) {
+  const parsed = parseGitHubUrl(gitUrl);
+  if (!parsed) return null;
+  const localRepoPath = path.join(configPaths.REPO_DIR, parsed.user, parsed.repo);
+  return localRepoPath;
 }
 
-export async function cloneRepo(repoUrl: string, useCachedRepo?: boolean): Promise<boolean> {
-  const repoExists = fs.existsSync(TEMP_DIR_PATH);
+const config = ConfigManager.getInstance().getConfig();
+const commonOptions = ConfigManager.getInstance().getCommonOptions();
 
-  if (useCachedRepo && repoExists) {
+export async function cloneRepo(gitUrl: string): Promise<boolean> {
+  const localRepoPath = getLocalRepoPath(gitUrl);
+  if (!localRepoPath) return false;
+  const repoExists = fs.existsSync(localRepoPath);
+
+  let useCache =
+    repoExists && commonOptions.manual
+      ? await confirm({ message: 'Use cached repo?', default: true })
+      : config.useCache;
+
+  if (useCache && repoExists) {
     logMessages([{ message: 'Using cached repository (skipping clone)...', emoji: '📦' }]);
     return true;
   }
   const git = simpleGit();
   try {
-    await removeTempDir();
+    const parsed = parseGitHubUrl(gitUrl);
+    await fs.remove(localRepoPath);
     logMessages([{ message: 'Cloning module repository...' }]);
-    const parsed = parseGitHubUrl(repoUrl);
+
     if (!parsed) return false;
-    await git.clone(parsed.repoUrl, TEMP_DIR_PATH, ['--branch', parsed.branch]);
+    await git.clone(parsed.repoUrl, localRepoPath, ['--branch', parsed.branch]);
     return true;
   } catch (err) {
     logMessages([
       { message: 'Failed to clone the module repo.', level: 'error' },
-      { message: `Please check if this repo exists and you have access: ${repoUrl}`, level: 'warn' },
+      { message: `Please check if this repo exists and you have access: ${gitUrl}`, level: 'warn' },
     ]);
-    await removeTempDir();
+    await fs.remove(localRepoPath);
     return false;
   }
 }
-
